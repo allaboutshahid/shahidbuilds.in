@@ -147,7 +147,7 @@ window.addEventListener("scroll", () => {
   });
 
 });
-fetch("https://api.github.com/users/abdulshahid84868-ship-it/repos")
+fetch("https://api.github.com/users/allaboutshahid/repos")
 .then(response => response.json())
 .then(repos => {
 
