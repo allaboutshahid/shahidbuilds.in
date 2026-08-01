@@ -640,3 +640,38 @@ opacity:1;
 color:#a855f7;
 text-shadow:0 0 15px rgba(168,85,247,.4);
 }
+/* GitHub Contribution Calendar */
+
+.calendar{
+    max-width:100%;
+    margin:40px auto 0;
+    padding:25px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:20px;
+    backdrop-filter:blur(20px);
+    overflow-x:auto;
+}
+
+.calendar .width-full{
+    min-width:760px;
+}
+
+.calendar svg{
+    width:100%;
+    height:auto;
+}
+
+.calendar text{
+    fill:#b8b8c5 !important;
+}
+
+.calendar rect{
+    rx:3;
+    transition:.3s;
+}
+
+.calendar rect:hover{
+    stroke:#a855f7;
+    stroke-width:2;
+}
