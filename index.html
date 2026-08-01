@@ -14,6 +14,7 @@
 
 <link rel="stylesheet" href="style.css">
 
+<link rel="stylesheet" href="https://unpkg.com/github-calendar@latest/dist/github-calendar-responsive.css">
 </head>
 
 <body>
@@ -226,51 +227,13 @@ Learning Progress
 
 </section>
 
-<section id="projects">
+<section id="contributions">
 
-<div class="section-title">
-Featured Projects
-</div>
+    <div class="section-title">
+        GitHub Contributions
+    </div>
 
-<div class="projects-grid">
-
-<div class="project-card">
-<h3>Attendance Risk Predictor</h3>
-<p>Predict attendance shortage risk.</p>
-<div class="tech">Python</div>
-</div>
-
-<div class="project-card">
-<h3>CGPA Predictor</h3>
-<p>Predict future CGPA performance.</p>
-<div class="tech">Python</div>
-</div>
-
-<div class="project-card">
-<h3>Student Dashboard</h3>
-<p>Academic management dashboard.</p>
-<div class="tech">HTML • CSS • JavaScript</div>
-</div>
-
-<div class="project-card">
-<h3>Quiz App</h3>
-<p>Interactive quiz application.</p>
-<div class="tech">JavaScript</div>
-</div>
-
-<div class="project-card">
-<h3>Bank Management System</h3>
-<p>Banking management project.</p>
-<div class="tech">C++</div>
-</div>
-
-<div class="project-card">
-<h3>Attendance Management System</h3>
-<p>Track and manage attendance.</p>
-<div class="tech">Python</div>
-</div>
-
-</div>
+    <div class="calendar"></div>
 
 </section>
 
@@ -361,10 +324,16 @@ abdulshahid84868@gmail.com
 </section>
 
 <footer>
-
-© 2025 Abdul Shahid
-
+    © 2025 Abdul Shahid
 </footer>
+
+<script src="https://unpkg.com/github-calendar@latest/dist/github-calendar.min.js"></script>
+
+<script>
+GitHubCalendar(".calendar", "allaboutshahid", {
+    responsive: true
+});
+</script>
 
 <script src="script.js"></script>
 
