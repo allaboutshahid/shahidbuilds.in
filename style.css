@@ -640,79 +640,27 @@ opacity:1;
 color:#a855f7;
 text-shadow:0 0 15px rgba(168,85,247,.4);
 }
-/* GitHub Contribution Calendar */
 
-.calendar{
-    max-width:100%;
-    margin:40px auto 0;
-    padding:25px;
-    background:rgba(255,255,255,.04);
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:20px;
-    backdrop-filter:blur(20px);
-    overflow-x:auto;
+
+
+#contributions{
+    width:90%;
+    max-width:1200px;
+    margin:80px auto;
+    display:flex;
+    justify-content:center;
+    align-items:center;
 }
 
-.calendar .width-full{
-    min-width:760px;
-}
-
-.calendar svg{
+.github-calendar{
     width:100%;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+}
+
+.github-calendar img{
+    width:100%;
+    max-width:900px;
     height:auto;
-}
-
-.calendar text{
-    fill:#b8b8c5 !important;
-}
-
-.calendar rect{
-    rx:3;
-    transition:.3s;
-}
-
-.calendar rect:hover{
-/* Clean GitHub Calendar */
-
-.calendar {
-    max-width: 100%;
-    overflow-x: auto;
-    padding: 20px;
-    background: rgba(255,255,255,.04);
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 20px;
-    backdrop-filter: blur(20px);
-}
-
-/* Hide labels */
-.calendar .contrib-footer,
-.calendar .float-left.text-gray,
-.calendar .float-right.text-gray,
-.calendar .ContributionCalendar-label,
-.calendar text {
-    display: none !important;
-}
-
-/* Remove extra margin */
-.calendar svg {
-    width: 100%;
-    height: auto;
-    margin: 0 auto;
-    display: block;
-}
-
-/* Round squares */
-.calendar rect {
-    rx: 3;
-    ry: 3;
-    transition: .2s ease;
-}
-
-/* Hover effect */
-.calendar rect:hover {
-    stroke: #a855f7;
-    stroke-width: 2;
-}
-    stroke:#a855f7;
-    stroke-width:2;
 }
