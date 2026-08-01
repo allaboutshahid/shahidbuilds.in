@@ -796,9 +796,19 @@ text-shadow:0 0 15px rgba(168,85,247,.4);
 .dot.js{background:linear-gradient(90deg,#F7DF1E,#FFD43B);}
 .dot.python{background:linear-gradient(90deg,#3776AB,#FFD43B);}
 .dot.java{background:linear-gradient(90deg,#5382A1,#E76F00);}
+.dot.sql{background:linear-gradient(90deg,#336791,#4479A1);}
+.dot.ts{background:linear-gradient(90deg,#3178C6,#5A9FE2);}
 
 .fill.java{
 background:linear-gradient(90deg,#5382A1,#E76F00);
+}
+
+.fill.sql{
+background:linear-gradient(90deg,#336791,#4479A1);
+}
+
+.fill.ts{
+background:linear-gradient(90deg,#3178C6,#5A9FE2);
 }
 
 .skill-level b{
@@ -863,6 +873,25 @@ margin-left:2px;
     background:var(--primary);
     border-color:var(--primary);
     box-shadow:0 0 20px rgba(168,85,247,.4);
+}
+
+.streak-card{
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.05);
+    border-radius:20px;
+    padding:16px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+    margin-bottom:20px;
+}
+
+.streak-card img{
+    width:100%;
+    max-width:480px;
+    height:auto;
+    display:block;
 }
 
 .github-chart-wrap{
