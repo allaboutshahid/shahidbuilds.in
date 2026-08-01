@@ -640,95 +640,69 @@ opacity:1;
 color:#a855f7;
 text-shadow:0 0 15px rgba(168,85,247,.4);
 }
-/* GitHub Contributions Professional */
+/* GITHUB CONTRIBUTION CALENDAR */
 
 #contributions{
-    width:100%;
     max-width:1200px;
     margin:80px auto;
     padding:20px 15px;
 }
 
 
-#contributions .section-title{
-    font-size:clamp(1.8rem,5vw,2.8rem);
-    text-align:center;
-    margin-bottom:35px;
-    color:white;
+.github-card{
 
-    text-shadow:
-    0 0 10px #a855f7,
-    0 0 25px #a855f7;
-}
+    margin-top:35px;
 
+    padding:30px;
 
-
-.github-calendar{
-
-    width:100%;
-    padding:25px;
-
-    border-radius:25px;
-
-    background:
-    rgba(255,255,255,.05);
-
-    border:1px solid rgba(168,85,247,.45);
-
-    box-shadow:
-    0 0 40px rgba(168,85,247,.35);
+    background:rgba(255,255,255,.04);
 
     backdrop-filter:blur(20px);
 
+    border-radius:25px;
+
+    border:1px solid rgba(168,85,247,.25);
+
+    box-shadow:
+    0 0 35px rgba(168,85,247,.25);
+
     display:flex;
+
     justify-content:center;
+
+    overflow:auto;
+
 }
 
 
+.github-card img{
 
-.github-calendar img{
+    width:900px;
 
-    width:100%;
-    max-width:1000px;
+    max-width:none;
 
-    height:auto;
-
-    border-radius:18px;
+    border-radius:15px;
 
     filter:
-    drop-shadow(0 0 18px rgba(168,85,247,.7));
+    drop-shadow(0 0 15px rgba(168,85,247,.5));
 
 }
 
 
-
-/* PHONE VERSION */
+/* MOBILE */
 
 @media(max-width:768px){
 
-#contributions{
-    padding:20px 10px;
-}
+.github-card{
 
-
-.github-calendar{
-
-    padding:12px;
+    padding:15px;
 
 }
 
 
-.github-calendar img{
+.github-card img{
 
-    width:100%;
-    height:auto;
-
-}
-
-
-#contributions .section-title{
-
-    font-size:1.6rem;
+    width:700px;
 
 }
 
