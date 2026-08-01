@@ -309,6 +309,10 @@ font-weight:600;
 letter-spacing:.3px;
 }
 
+.tech + .tech{
+margin-left:8px;
+}
+
 .contact-card{
 text-align:center;
 }
@@ -502,9 +506,11 @@ padding:30px;
 
 display:flex;
 
-justify-content:space-between;
+justify-content:flex-start;
 
 align-items:center;
+
+gap:18px;
 
 margin-bottom:25px;
 
@@ -531,6 +537,8 @@ font-size:.88rem;
 width:70px;
 height:70px;
 
+flex-shrink:0;
+
 display:flex;
 
 justify-content:center;
@@ -543,6 +551,8 @@ border-radius:50%;
 background:#1DB95422;
 
 border:1px solid #1DB95455;
+
+color:#1DB954;
 
 }
 
@@ -667,10 +677,8 @@ text-shadow:0 0 15px rgba(168,85,247,.4);
     0 0 35px rgba(168,85,247,.25);
 
     display:flex;
-
-    justify-content:center;
-
-    overflow:auto;
+    flex-direction:column;
+    gap:20px;
 
 }
 
@@ -704,6 +712,205 @@ text-shadow:0 0 15px rgba(168,85,247,.4);
 
     width:700px;
 
+}
+
+}
+
+/* --- Section subtitle (Skills / GitHub Activity / Spotify) --- */
+
+.section-subtitle{
+    text-align:center;
+    color:var(--muted);
+    font-size:.92rem;
+    max-width:560px;
+    margin:-20px auto 35px;
+    line-height:1.7;
+}
+
+/* --- Technical Skills, serial-line layout --- */
+
+.skills-list{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    max-width:760px;
+    margin:0 auto;
+}
+
+.skill-row{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.05);
+    border-radius:16px;
+    padding:16px 22px;
+    transition:.3s;
+}
+
+.skill-row:hover{
+    border-color:rgba(168,85,247,.25);
+}
+
+.skill-index{
+    flex-shrink:0;
+    width:32px;
+    font-size:.85rem;
+    font-weight:700;
+    color:var(--primary);
+    letter-spacing:.5px;
+}
+
+.skill-info{
+    flex:1;
+    min-width:0;
+}
+
+.skill-name{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:600;
+    font-size:.92rem;
+}
+
+.skill-level{
+    color:var(--muted);
+    font-size:.78rem;
+    font-weight:500;
+    letter-spacing:.2px;
+    flex-shrink:0;
+}
+
+.dot{
+    display:inline-block;
+    width:10px;
+    height:10px;
+    border-radius:50%;
+}
+
+.dot.c{background:linear-gradient(90deg,#004482,#00599C);}
+.dot.cpp{background:linear-gradient(90deg,#00599C,#659AD2);}
+.dot.html{background:linear-gradient(90deg,#E34F26,#F06529);}
+.dot.css{background:linear-gradient(90deg,#1572B6,#33A9DC);}
+.dot.js{background:linear-gradient(90deg,#F7DF1E,#FFD43B);}
+.dot.python{background:linear-gradient(90deg,#3776AB,#FFD43B);}
+.dot.java{background:linear-gradient(90deg,#5382A1,#E76F00);}
+
+.fill.java{
+background:linear-gradient(90deg,#5382A1,#E76F00);
+}
+
+.skill-level b{
+color:var(--text);
+font-weight:600;
+margin-left:2px;
+}
+
+/* --- GitHub Activity, professional header --- */
+
+.github-card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:15px;
+}
+
+.github-user{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.github-icon{
+    width:44px;
+    height:44px;
+    flex-shrink:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    border-radius:50%;
+    background:rgba(168,85,247,.12);
+    border:1px solid rgba(168,85,247,.35);
+    color:var(--primary);
+    font-size:1.2rem;
+}
+
+.github-user h4{
+    font-size:1rem;
+    font-weight:600;
+}
+
+.github-user p{
+    color:var(--muted);
+    font-size:.8rem;
+}
+
+.github-link{
+    padding:10px 18px;
+    border-radius:12px;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.08);
+    color:white;
+    text-decoration:none;
+    font-size:.82rem;
+    font-weight:600;
+    transition:.3s;
+}
+
+.github-link:hover{
+    background:var(--primary);
+    border-color:var(--primary);
+    box-shadow:0 0 20px rgba(168,85,247,.4);
+}
+
+.github-chart-wrap{
+    display:flex;
+    justify-content:flex-start;
+    overflow-x:auto;
+    padding-bottom:6px;
+}
+
+.github-chart-wrap img{
+    width:100%;
+    min-width:600px;
+    max-width:900px;
+    height:auto;
+}
+
+@media(max-width:768px){
+
+.github-card-header{
+    justify-content:center;
+    text-align:center;
+}
+
+.github-stats-grid{
+    grid-template-columns:1fr;
+}
+
+.stat-card img{
+    max-width:100%;
+}
+
+.skill-row{
+    padding:14px 16px;
+    gap:12px;
+}
+
+.skill-index{
+    width:26px;
+    font-size:.78rem;
+}
+
+.skill-name{
+    font-size:.85rem;
+    gap:8px;
+}
+
+.skill-level{
+    font-size:.72rem;
 }
 
 }
