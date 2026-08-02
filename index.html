@@ -407,8 +407,7 @@ function renderProjects(repos){
 
     var filtered = repos
         .filter(function(r){ return !r.fork; })
-        .sort(function(a, b){ return new Date(b.updated_at) - new Date(a.updated_at); })
-        .slice(0, 6);
+        .sort(function(a, b){ return new Date(b.updated_at) - new Date(a.updated_at); });
 
     if(filtered.length === 0){
         container.innerHTML = '<p style="color:var(--muted);text-align:center;grid-column:1/-1;">No public repositories yet.</p>';
