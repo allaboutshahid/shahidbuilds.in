@@ -165,6 +165,13 @@ GitHub Activity
 A snapshot of my coding consistency and open-source contributions.
 </p>
 
+<div class="streak-card">
+<img
+src="https://github-readme-streak-stats.herokuapp.com/?user=allaboutshahid&hide_border=true&background=00000000&ring=a855f7&fire=d8b4fe&currStreakLabel=a855f7&sideLabels=b8b8c5&currStreakNum=ffffff&sideNums=ffffff&dates=b8b8c5"
+alt="Abdul Shahid's GitHub streak"
+loading="lazy">
+</div>
+
 <div class="github-card">
 
 <div class="github-card-header">
@@ -304,67 +311,6 @@ function escapeHtml(str){
     return div.innerHTML;
 }
 
-var container=document.getElementById('github-projects');
-if(container){
-
-container.innerHTML='<p style="color:var(--muted);text-align:center;grid-column:1/-1;">Loading repositories…</p>';
-
-fetch('https://api.github.com/users/allaboutshahid/repos?sort=updated&per_page=100')
-.then(function(res){
-    if(!res.ok) throw new Error('GitHub API error');
-    return res.json();
-})
-.then(function(repos){
-
-    var filtered=repos
-        .filter(function(r){ return !r.fork; })
-        .sort(function(a,b){ return new Date(b.updated_at) - new Date(a.updated_at); })
-        .slice(0,6);
-
-    if(filtered.length===0){
-        container.innerHTML='<p style="color:var(--muted);text-align:center;grid-column:1/-1;">No public repositories yet.</p>';
-        return;
-    }
-
-    container.innerHTML='';
-
-    filtered.forEach(function(repo){
-
-        var card=document.createElement('div');
-        card.className='project-card';
-
-        var desc=repo.description ? escapeHtml(repo.description) : 'No description provided.';
-        var name=escapeHtml(repo.name);
-        var lang=repo.language ? '<span class="tech">'+escapeHtml(repo.language)+'</span>' : '';
-        var stars=repo.stargazers_count > 0 ? '<span class="tech">★ '+repo.stargazers_count+'</span>' : '';
-
-        card.innerHTML=
-            '<div>'+
-                '<h3>'+name+'</h3>'+
-                '<p>'+desc+'</p>'+
-            '</div>'+
-            '<div>'+
-                lang+stars+
-                '<br>'+
-                '<a href="'+repo.html_url+'" target="_blank">View Repository →</a>'+
-            '</div>';
-
-        container.appendChild(card);
-    });
-
-})
-.catch(function(){
-    container.innerHTML='<p style="color:var(--muted);text-align:center;grid-column:1/-1;">Unable to load repositories right now. <a href="https://github.com/allaboutshahid" target="_blank" style="color:#a855f7;">View on GitHub →</a></p>';
-});
-
-}
-
-})();
-</script>
-
-<script>
-(function(){
-
 var langColors = {
 "C":"#004482","C++":"#00599C","Python":"#3572A5","JavaScript":"#F7DF1E",
 "TypeScript":"#3178C6","HTML":"#E34F26","CSS":"#1572B6","Java":"#5382A1",
@@ -378,71 +324,114 @@ var targetLangs = [
 "Java","Go","Rust","PHP","Kotlin","Swift","Shell","C#"
 ];
 
-var container = document.getElementById('skills-list');
-if(!container) return;
+var projectsContainer = document.getElementById('github-projects');
+var skillsContainer = document.getElementById('skills-list');
 
-fetch('https://api.github.com/users/allaboutshahid/repos?per_page=100')
-.then(function(res){ return res.json(); })
+if(projectsContainer){
+    projectsContainer.innerHTML='<p style="color:var(--muted);text-align:center;grid-column:1/-1;">Loading repositories…</p>';
+}
+
+fetch('https://api.github.com/users/allaboutshahid/repos?sort=updated&per_page=100')
+.then(function(res){
+    if(!res.ok) throw new Error('GitHub API error');
+    return res.json();
+})
 .then(function(repos){
 
     repos = repos.filter(function(r){ return !r.fork; });
 
-    var langTotals = {};
-    var fetches = repos.map(function(repo){
-        return fetch(repo.languages_url)
-            .then(function(r){ return r.json(); })
-            .then(function(data){
-                for(var lang in data){
-                    langTotals[lang] = (langTotals[lang]||0) + data[lang];
-                }
-            })
-            .catch(function(){});
-    });
+    if(projectsContainer){
 
-    return Promise.all(fetches).then(function(){ return langTotals; });
+        var filtered = repos.slice()
+            .sort(function(a,b){ return new Date(b.updated_at) - new Date(a.updated_at); })
+            .slice(0,6);
 
-})
-.then(function(langTotals){
+        if(filtered.length===0){
+            projectsContainer.innerHTML='<p style="color:var(--muted);text-align:center;grid-column:1/-1;">No public repositories yet.</p>';
+        }else{
 
-    var totalBytes = 0;
-    for(var k in langTotals){ totalBytes += langTotals[k]; }
+            projectsContainer.innerHTML='';
 
-    var results = targetLangs.map(function(lang){
-        var bytes = langTotals[lang] || 0;
-        var pct = totalBytes > 0 ? Math.round((bytes/totalBytes)*100) : 0;
-        return { lang: lang, pct: pct };
-    }).sort(function(a,b){ return b.pct - a.pct; });
+            filtered.forEach(function(repo){
 
-    container.innerHTML = '';
+                var card=document.createElement('div');
+                card.className='project-card';
 
-    results.forEach(function(item, i){
-        var idx = String(i+1).padStart(2,'0');
-        var color = langColors[item.lang] || '#a855f7';
-        var level = item.pct===0 ? 'Not Started'
-                  : item.pct<20 ? 'Foundational'
-                  : item.pct<50 ? 'Intermediate'
-                  : 'Advanced';
+                var desc=repo.description ? escapeHtml(repo.description) : 'No description provided.';
+                var name=escapeHtml(repo.name);
+                var lang=repo.language ? '<span class="tech">'+escapeHtml(repo.language)+'</span>' : '';
+                var stars=repo.stargazers_count > 0 ? '<span class="tech">★ '+repo.stargazers_count+'</span>' : '';
 
-        var row = document.createElement('div');
-        row.className = 'skill-row';
-        row.innerHTML =
-            '<span class="skill-index">'+idx+'</span>'+
-            '<div class="skill-info">'+
-                '<div class="skill-top">'+
-                    '<span class="skill-name"><i class="dot" style="background:'+color+'"></i>'+item.lang+'</span>'+
-                    '<span class="skill-level">'+level+' <b>'+item.pct+'%</b></span>'+
-                '</div>'+
-                '<div class="bar">'+
-                    '<div class="fill" style="width:'+item.pct+'%;background:'+color+'"></div>'+
-                '</div>'+
-            '</div>';
+                card.innerHTML=
+                    '<div>'+
+                        '<h3>'+name+'</h3>'+
+                        '<p>'+desc+'</p>'+
+                    '</div>'+
+                    '<div>'+
+                        lang+stars+
+                        '<br>'+
+                        '<a href="'+repo.html_url+'" target="_blank">View Repository →</a>'+
+                    '</div>';
 
-        container.appendChild(row);
-    });
+                projectsContainer.appendChild(card);
+            });
+        }
+    }
+
+    if(skillsContainer){
+
+        var langCounts = {};
+        var countedRepos = 0;
+
+        repos.forEach(function(repo){
+            if(repo.language){
+                langCounts[repo.language] = (langCounts[repo.language]||0) + 1;
+                countedRepos++;
+            }
+        });
+
+        var results = targetLangs.map(function(lang){
+            var count = langCounts[lang] || 0;
+            var pct = countedRepos > 0 ? Math.round((count/countedRepos)*100) : 0;
+            return { lang: lang, pct: pct };
+        }).sort(function(a,b){ return b.pct - a.pct; });
+
+        skillsContainer.innerHTML = '';
+
+        results.forEach(function(item, i){
+            var idx = String(i+1).padStart(2,'0');
+            var color = langColors[item.lang] || '#a855f7';
+            var level = item.pct===0 ? 'Not Started'
+                      : item.pct<20 ? 'Foundational'
+                      : item.pct<50 ? 'Intermediate'
+                      : 'Advanced';
+
+            var row = document.createElement('div');
+            row.className = 'skill-row';
+            row.innerHTML =
+                '<span class="skill-index">'+idx+'</span>'+
+                '<div class="skill-info">'+
+                    '<div class="skill-top">'+
+                        '<span class="skill-name"><i class="dot" style="background:'+color+'"></i>'+item.lang+'</span>'+
+                        '<span class="skill-level">'+level+' <b>'+item.pct+'%</b></span>'+
+                    '</div>'+
+                    '<div class="bar">'+
+                        '<div class="fill" style="width:'+item.pct+'%;background:'+color+'"></div>'+
+                    '</div>'+
+                '</div>';
+
+            skillsContainer.appendChild(row);
+        });
+    }
 
 })
 .catch(function(){
-    container.innerHTML = '<p style="color:var(--muted);text-align:center;">Unable to load language stats right now.</p>';
+    if(projectsContainer){
+        projectsContainer.innerHTML='<p style="color:var(--muted);text-align:center;grid-column:1/-1;">Unable to load repositories right now. <a href="https://github.com/allaboutshahid" target="_blank" style="color:#a855f7;">View on GitHub →</a></p>';
+    }
+    if(skillsContainer){
+        skillsContainer.innerHTML = '<p style="color:var(--muted);text-align:center;">Unable to load language stats right now.</p>';
+    }
 });
 
 })();
