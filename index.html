@@ -147,131 +147,15 @@ Technical Skills
 </div>
 
 <p class="section-subtitle">
-Languages and tools I actively use and continue to strengthen.
+Real-time language breakdown pulled automatically from my GitHub repositories.
 </p>
 
-<div class="skills-list">
-
-<div class="skill-row">
-<span class="skill-index">01</span>
-<div class="skill-info">
-<div class="skill-top">
-<span class="skill-name"><i class="dot c"></i>C</span>
-<span class="skill-level">Intermediate <b>66%</b></span>
-</div>
-<div class="bar">
-<div class="fill c" style="width:66%"></div>
-</div>
-</div>
-</div>
-
-<div class="skill-row">
-<span class="skill-index">02</span>
-<div class="skill-info">
-<div class="skill-top">
-<span class="skill-name"><i class="dot cpp"></i>C++</span>
-<span class="skill-level">Intermediate <b>50%</b></span>
-</div>
-<div class="bar">
-<div class="fill cpp" style="width:50%"></div>
-</div>
-</div>
-</div>
-
-<div class="skill-row">
-<span class="skill-index">03</span>
-<div class="skill-info">
-<div class="skill-top">
-<span class="skill-name"><i class="dot python"></i>Python</span>
-<span class="skill-level">Intermediate <b>33%</b></span>
-</div>
-<div class="bar">
-<div class="fill python" style="width:33%"></div>
-</div>
-</div>
-</div>
-
-<div class="skill-row">
-<span class="skill-index">04</span>
-<div class="skill-info">
-<div class="skill-top">
-<span class="skill-name"><i class="dot html"></i>HTML</span>
-<span class="skill-level">Foundational <b>28%</b></span>
-</div>
-<div class="bar">
-<div class="fill html" style="width:28%"></div>
-</div>
-</div>
-</div>
-
-<div class="skill-row">
-<span class="skill-index">05</span>
-<div class="skill-info">
-<div class="skill-top">
-<span class="skill-name"><i class="dot css"></i>CSS</span>
-<span class="skill-level">Foundational <b>24%</b></span>
-</div>
-<div class="bar">
-<div class="fill css" style="width:24%"></div>
-</div>
-</div>
-</div>
-
-<div class="skill-row">
-<span class="skill-index">06</span>
-<div class="skill-info">
-<div class="skill-top">
-<span class="skill-name"><i class="dot js"></i>JavaScript</span>
-<span class="skill-level">Foundational <b>21%</b></span>
-</div>
-<div class="bar">
-<div class="fill js" style="width:21%"></div>
-</div>
-</div>
-</div>
-
-<div class="skill-row">
-<span class="skill-index">07</span>
-<div class="skill-info">
-<div class="skill-top">
-<span class="skill-name"><i class="dot java"></i>Java</span>
-<span class="skill-level">Just Started <b>0%</b></span>
-</div>
-<div class="bar">
-<div class="fill java" style="width:0%"></div>
-</div>
-</div>
-</div>
-
-<div class="skill-row">
-<span class="skill-index">08</span>
-<div class="skill-info">
-<div class="skill-top">
-<span class="skill-name"><i class="dot sql"></i>SQL</span>
-<span class="skill-level">Just Started <b>0%</b></span>
-</div>
-<div class="bar">
-<div class="fill sql" style="width:0%"></div>
-</div>
-</div>
-</div>
-
-<div class="skill-row">
-<span class="skill-index">09</span>
-<div class="skill-info">
-<div class="skill-top">
-<span class="skill-name"><i class="dot ts"></i>TypeScript</span>
-<span class="skill-level">Just Started <b>0%</b></span>
-</div>
-<div class="bar">
-<div class="fill ts" style="width:0%"></div>
-</div>
-</div>
-</div>
-
+<div id="skills-list" class="skills-list">
+<p class="skills-status">Loading live language stats from GitHub…</p>
 </div>
 
 </section>
+
 <section id="contributions">
 
 <div class="section-title">
@@ -422,66 +306,271 @@ abdulshahid84868@gmail.com
 <script>
 (function(){
 
+/* ============================================================
+   Shared GitHub data layer
+   - one place that fetches repos + per-repo language bytes
+   - cached in localStorage so repeat visits / both sections
+     (Projects + Skills) don't burn through GitHub's 60 req/hr
+     unauthenticated rate limit, which is the #1 reason the
+     project list or skill bars fail to load on a static site.
+   ============================================================ */
+
+var GH_USER = 'allaboutshahid';
+var CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
+function readCache(key){
+    try{
+        var raw = localStorage.getItem(key);
+        if(!raw) return null;
+        var parsed = JSON.parse(raw);
+        if(!parsed || (Date.now() - parsed.ts) > CACHE_TTL) return null;
+        return parsed.data;
+    }catch(e){
+        return null;
+    }
+}
+
+function writeCache(key, data){
+    try{
+        localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data: data }));
+    }catch(e){
+        /* storage unavailable/full — safe to ignore */
+    }
+}
+
+function ghFetch(url){
+    return fetch(url, {
+        headers: { 'Accept': 'application/vnd.github+json' }
+    }).then(function(res){
+        if(!res.ok){
+            var remaining = res.headers.get('X-RateLimit-Remaining');
+            var err = new Error('GH_HTTP_' + res.status);
+            err.rateLimited = (res.status === 403 && remaining === '0');
+            throw err;
+        }
+        return res.json();
+    });
+}
+
+function getRepos(){
+    var cached = readCache('gh_repos_' + GH_USER);
+    if(cached) return Promise.resolve(cached);
+
+    return ghFetch('https://api.github.com/users/' + GH_USER + '/repos?sort=updated&per_page=100')
+        .then(function(repos){
+            writeCache('gh_repos_' + GH_USER, repos);
+            return repos;
+        });
+}
+
+function getLanguageTotals(repos){
+    var cached = readCache('gh_langtotals_' + GH_USER);
+    if(cached) return Promise.resolve(cached);
+
+    var nonFork = repos.filter(function(r){ return !r.fork; });
+    var totals = {};
+
+    var chain = Promise.resolve();
+    nonFork.forEach(function(repo){
+        chain = chain.then(function(){
+            return ghFetch(repo.languages_url)
+                .then(function(langs){
+                    Object.keys(langs).forEach(function(lang){
+                        totals[lang] = (totals[lang] || 0) + langs[lang];
+                    });
+                })
+                .catch(function(){
+                    /* skip a single repo's language data on failure */
+                });
+        });
+    });
+
+    return chain.then(function(){
+        writeCache('gh_langtotals_' + GH_USER, totals);
+        return totals;
+    });
+}
+
 function escapeHtml(str){
-    var div=document.createElement('div');
-    div.textContent=str;
+    var div = document.createElement('div');
+    div.textContent = str;
     return div.innerHTML;
 }
 
-var container=document.getElementById('github-projects');
-if(container){
+/* ============================================================
+   Projects grid
+   ============================================================ */
 
-container.innerHTML='<p style="color:var(--muted);text-align:center;grid-column:1/-1;">Loading repositories…</p>';
+function renderProjects(repos){
+    var container = document.getElementById('github-projects');
+    if(!container) return;
 
-fetch('https://api.github.com/users/allaboutshahid/repos?sort=updated&per_page=100')
-.then(function(res){
-    if(!res.ok) throw new Error('GitHub API error');
-    return res.json();
-})
-.then(function(repos){
-
-    var filtered=repos
+    var filtered = repos
         .filter(function(r){ return !r.fork; })
-        .sort(function(a,b){ return new Date(b.updated_at) - new Date(a.updated_at); })
-        .slice(0,6);
+        .sort(function(a, b){ return new Date(b.updated_at) - new Date(a.updated_at); })
+        .slice(0, 6);
 
-    if(filtered.length===0){
-        container.innerHTML='<p style="color:var(--muted);text-align:center;grid-column:1/-1;">No public repositories yet.</p>';
+    if(filtered.length === 0){
+        container.innerHTML = '<p style="color:var(--muted);text-align:center;grid-column:1/-1;">No public repositories yet.</p>';
         return;
     }
 
-    container.innerHTML='';
+    container.innerHTML = '';
 
     filtered.forEach(function(repo){
+        var card = document.createElement('div');
+        card.className = 'project-card';
 
-        var card=document.createElement('div');
-        card.className='project-card';
+        var desc = repo.description ? escapeHtml(repo.description) : 'No description provided.';
+        var name = escapeHtml(repo.name);
+        var lang = repo.language ? '<span class="tech">' + escapeHtml(repo.language) + '</span>' : '';
+        var stars = repo.stargazers_count > 0 ? '<span class="tech">★ ' + repo.stargazers_count + '</span>' : '';
 
-        var desc=repo.description ? escapeHtml(repo.description) : 'No description provided.';
-        var name=escapeHtml(repo.name);
-        var lang=repo.language ? '<span class="tech">'+escapeHtml(repo.language)+'</span>' : '';
-        var stars=repo.stargazers_count > 0 ? '<span class="tech">★ '+repo.stargazers_count+'</span>' : '';
-
-        card.innerHTML=
-            '<div>'+
-                '<h3>'+name+'</h3>'+
-                '<p>'+desc+'</p>'+
-            '</div>'+
-            '<div>'+
-                lang+stars+
-                '<br>'+
-                '<a href="'+repo.html_url+'" target="_blank">View Repository →</a>'+
+        card.innerHTML =
+            '<div>' +
+                '<h3>' + name + '</h3>' +
+                '<p>' + desc + '</p>' +
+            '</div>' +
+            '<div>' +
+                lang + stars +
+                '<br>' +
+                '<a href="' + repo.html_url + '" target="_blank">View Repository →</a>' +
             '</div>';
 
         container.appendChild(card);
     });
-
-})
-.catch(function(){
-    container.innerHTML='<p style="color:var(--muted);text-align:center;grid-column:1/-1;">Unable to load repositories right now. <a href="https://github.com/allaboutshahid" target="_blank" style="color:#a855f7;">View on GitHub →</a></p>';
-});
-
 }
+
+function renderProjectsError(err){
+    var container = document.getElementById('github-projects');
+    if(!container) return;
+
+    var message = (err && err.rateLimited)
+        ? 'GitHub\u2019s hourly API limit was reached, so live repos can\u2019t load right now. Please refresh in a bit.'
+        : 'Unable to load repositories right now.';
+
+    container.innerHTML =
+        '<p style="color:var(--muted);text-align:center;grid-column:1/-1;">' + message +
+        ' <a href="https://github.com/' + GH_USER + '" target="_blank" style="color:#a855f7;">View on GitHub →</a></p>';
+}
+
+/* ============================================================
+   Technical Skills — real language percentages from GitHub
+   ============================================================ */
+
+var LANGUAGE_COLORS = {
+    'JavaScript':        ['#F7DF1E', '#FFD43B'],
+    'TypeScript':         ['#3178C6', '#5A9FE2'],
+    'Python':             ['#3776AB', '#FFD43B'],
+    'Java':               ['#5382A1', '#E76F00'],
+    'C':                  ['#004482', '#00599C'],
+    'C++':                ['#00599C', '#659AD2'],
+    'C#':                 ['#178600', '#68C43C'],
+    'HTML':               ['#E34F26', '#F06529'],
+    'CSS':                ['#1572B6', '#33A9DC'],
+    'SCSS':               ['#C6538C', '#F09FC2'],
+    'Shell':              ['#89E051', '#4EAA25'],
+    'PowerShell':         ['#012456', '#3B7CB7'],
+    'Ruby':               ['#701516', '#CC342D'],
+    'PHP':                ['#4F5D95', '#8892BF'],
+    'Go':                 ['#00ADD8', '#5DC9E2'],
+    'Rust':               ['#DEA584', '#B7410E'],
+    'Kotlin':             ['#7F52FF', '#A57BFF'],
+    'Swift':              ['#F05138', '#FFAC45'],
+    'Dart':               ['#00B4AB', '#0175C2'],
+    'SQL':                ['#336791', '#4479A1'],
+    'R':                  ['#198CE7', '#276DC3'],
+    'Jupyter Notebook':   ['#DA5B0B', '#F37626'],
+    'Vue':                ['#41B883', '#35495E'],
+    'Dockerfile':         ['#384D54', '#2496ED'],
+    'Makefile':           ['#427819', '#6E9F1E'],
+    'MATLAB':             ['#E16737', '#0076A8'],
+    'Lua':                ['#000080', '#4477AA'],
+    'Perl':               ['#0298C3', '#39457E'],
+    'Assembly':           ['#6E4C13', '#A97D30'],
+    'Objective-C':        ['#438EFF', '#71A9FF'],
+    'Scala':              ['#C22D40', '#DC322F']
+};
+
+function colorsForLanguage(lang){
+    return LANGUAGE_COLORS[lang] || ['#a855f7', '#d8b4fe'];
+}
+
+function levelLabel(pct){
+    if(pct >= 40) return 'Advanced';
+    if(pct >= 20) return 'Intermediate';
+    if(pct >= 8)  return 'Foundational';
+    return 'Just Started';
+}
+
+function renderSkills(totals){
+    var container = document.getElementById('skills-list');
+    if(!container) return;
+
+    var entries = Object.keys(totals)
+        .map(function(lang){ return { name: lang, bytes: totals[lang] }; })
+        .filter(function(e){ return e.bytes > 0; })
+        .sort(function(a, b){ return b.bytes - a.bytes; })
+        .slice(0, 15);
+
+    if(entries.length === 0){
+        container.innerHTML = '<p class="skills-status">No language data available yet — check back once repositories have more code.</p>';
+        return;
+    }
+
+    var totalBytes = entries.reduce(function(sum, e){ return sum + e.bytes; }, 0);
+
+    container.innerHTML = '';
+
+    entries.forEach(function(entry, i){
+        var pct = totalBytes > 0 ? (entry.bytes / totalBytes) * 100 : 0;
+        var pctDisplay = pct >= 10 ? Math.round(pct) : Math.round(pct * 10) / 10;
+        var colors = colorsForLanguage(entry.name);
+        var index = String(i + 1).padStart(2, '0');
+
+        var row = document.createElement('div');
+        row.className = 'skill-row';
+        row.innerHTML =
+            '<span class="skill-index">' + index + '</span>' +
+            '<div class="skill-info">' +
+                '<div class="skill-top">' +
+                    '<span class="skill-name">' +
+                        '<i class="dot" style="background:linear-gradient(90deg,' + colors[0] + ',' + colors[1] + ')"></i>' +
+                        escapeHtml(entry.name) +
+                    '</span>' +
+                    '<span class="skill-level">' + levelLabel(pct) + ' <b>' + pctDisplay + '%</b></span>' +
+                '</div>' +
+                '<div class="bar">' +
+                    '<div class="fill" style="width:' + pct + '%;background:linear-gradient(90deg,' + colors[0] + ',' + colors[1] + ')"></div>' +
+                '</div>' +
+            '</div>';
+
+        container.appendChild(row);
+    });
+}
+
+function renderSkillsError(){
+    var container = document.getElementById('skills-list');
+    if(!container) return;
+    container.innerHTML = '<p class="skills-status">Live language stats are unavailable right now — please refresh shortly.</p>';
+}
+
+/* ============================================================
+   Boot
+   ============================================================ */
+
+getRepos()
+    .then(function(repos){
+        renderProjects(repos);
+
+        getLanguageTotals(repos)
+            .then(renderSkills)
+            .catch(renderSkillsError);
+    })
+    .catch(function(err){
+        renderProjectsError(err);
+        renderSkillsError();
+    });
 
 })();
 </script>
