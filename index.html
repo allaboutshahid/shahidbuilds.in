@@ -147,128 +147,11 @@ Technical Skills
 </div>
 
 <p class="section-subtitle">
-Languages and tools I actively use and continue to strengthen.
+Real usage percentages pulled automatically from my GitHub repositories.
 </p>
 
-<div class="skills-list">
-
-<div class="skill-row">
-<span class="skill-index">01</span>
-<div class="skill-info">
-<div class="skill-top">
-<span class="skill-name"><i class="dot c"></i>C</span>
-<span class="skill-level">Intermediate <b>66%</b></span>
-</div>
-<div class="bar">
-<div class="fill c" style="width:66%"></div>
-</div>
-</div>
-</div>
-
-<div class="skill-row">
-<span class="skill-index">02</span>
-<div class="skill-info">
-<div class="skill-top">
-<span class="skill-name"><i class="dot cpp"></i>C++</span>
-<span class="skill-level">Intermediate <b>50%</b></span>
-</div>
-<div class="bar">
-<div class="fill cpp" style="width:50%"></div>
-</div>
-</div>
-</div>
-
-<div class="skill-row">
-<span class="skill-index">03</span>
-<div class="skill-info">
-<div class="skill-top">
-<span class="skill-name"><i class="dot python"></i>Python</span>
-<span class="skill-level">Intermediate <b>33%</b></span>
-</div>
-<div class="bar">
-<div class="fill python" style="width:33%"></div>
-</div>
-</div>
-</div>
-
-<div class="skill-row">
-<span class="skill-index">04</span>
-<div class="skill-info">
-<div class="skill-top">
-<span class="skill-name"><i class="dot html"></i>HTML</span>
-<span class="skill-level">Foundational <b>28%</b></span>
-</div>
-<div class="bar">
-<div class="fill html" style="width:28%"></div>
-</div>
-</div>
-</div>
-
-<div class="skill-row">
-<span class="skill-index">05</span>
-<div class="skill-info">
-<div class="skill-top">
-<span class="skill-name"><i class="dot css"></i>CSS</span>
-<span class="skill-level">Foundational <b>24%</b></span>
-</div>
-<div class="bar">
-<div class="fill css" style="width:24%"></div>
-</div>
-</div>
-</div>
-
-<div class="skill-row">
-<span class="skill-index">06</span>
-<div class="skill-info">
-<div class="skill-top">
-<span class="skill-name"><i class="dot js"></i>JavaScript</span>
-<span class="skill-level">Foundational <b>21%</b></span>
-</div>
-<div class="bar">
-<div class="fill js" style="width:21%"></div>
-</div>
-</div>
-</div>
-
-<div class="skill-row">
-<span class="skill-index">07</span>
-<div class="skill-info">
-<div class="skill-top">
-<span class="skill-name"><i class="dot java"></i>Java</span>
-<span class="skill-level">Just Started <b>0%</b></span>
-</div>
-<div class="bar">
-<div class="fill java" style="width:0%"></div>
-</div>
-</div>
-</div>
-
-<div class="skill-row">
-<span class="skill-index">08</span>
-<div class="skill-info">
-<div class="skill-top">
-<span class="skill-name"><i class="dot sql"></i>SQL</span>
-<span class="skill-level">Just Started <b>0%</b></span>
-</div>
-<div class="bar">
-<div class="fill sql" style="width:0%"></div>
-</div>
-</div>
-</div>
-
-<div class="skill-row">
-<span class="skill-index">09</span>
-<div class="skill-info">
-<div class="skill-top">
-<span class="skill-name"><i class="dot ts"></i>TypeScript</span>
-<span class="skill-level">Just Started <b>0%</b></span>
-</div>
-<div class="bar">
-<div class="fill ts" style="width:0%"></div>
-</div>
-</div>
-</div>
-
+<div class="skills-list" id="skills-list">
+<p style="color:var(--muted);text-align:center;">Loading language stats…</p>
 </div>
 
 </section>
@@ -308,6 +191,13 @@ loading="lazy">
 View Profile
 </a>
 
+</div>
+
+<div class="total-contrib-card">
+<img
+src="https://github-readme-streak-stats.herokuapp.com/?user=allaboutshahid&hide_border=true&background=00000000&ring=a855f7&fire=d8b4fe&currStreakLabel=a855f7&sideLabels=b8b8c5&currStreakNum=ffffff&sideNums=ffffff&dates=b8b8c5&hide_current_streak=true&hide_longest_streak=true&card_width=260"
+alt="Total Contributions"
+loading="lazy">
 </div>
 
 <div class="github-chart-wrap">
@@ -482,6 +372,92 @@ fetch('https://api.github.com/users/allaboutshahid/repos?sort=updated&per_page=1
 });
 
 }
+
+})();
+</script>
+
+<script>
+(function(){
+
+var langColors = {
+"C":"#004482","C++":"#00599C","Python":"#3572A5","JavaScript":"#F7DF1E",
+"TypeScript":"#3178C6","HTML":"#E34F26","CSS":"#1572B6","Java":"#5382A1",
+"PLpgSQL":"#336791","Go":"#00ADD8","Rust":"#DEA584","PHP":"#4F5D95",
+"Kotlin":"#A97BFF","Swift":"#F05138","Shell":"#89E051","Ruby":"#701516",
+"Dart":"#00B4AB","C#":"#178600"
+};
+
+var targetLangs = [
+"C","C++","Python","JavaScript","TypeScript","HTML","CSS",
+"Java","Go","Rust","PHP","Kotlin","Swift","Shell","C#"
+];
+
+var container = document.getElementById('skills-list');
+if(!container) return;
+
+fetch('https://api.github.com/users/allaboutshahid/repos?per_page=100')
+.then(function(res){ return res.json(); })
+.then(function(repos){
+
+    repos = repos.filter(function(r){ return !r.fork; });
+
+    var langTotals = {};
+    var fetches = repos.map(function(repo){
+        return fetch(repo.languages_url)
+            .then(function(r){ return r.json(); })
+            .then(function(data){
+                for(var lang in data){
+                    langTotals[lang] = (langTotals[lang]||0) + data[lang];
+                }
+            })
+            .catch(function(){});
+    });
+
+    return Promise.all(fetches).then(function(){ return langTotals; });
+
+})
+.then(function(langTotals){
+
+    var totalBytes = 0;
+    for(var k in langTotals){ totalBytes += langTotals[k]; }
+
+    var results = targetLangs.map(function(lang){
+        var bytes = langTotals[lang] || 0;
+        var pct = totalBytes > 0 ? Math.round((bytes/totalBytes)*100) : 0;
+        return { lang: lang, pct: pct };
+    }).sort(function(a,b){ return b.pct - a.pct; });
+
+    container.innerHTML = '';
+
+    results.forEach(function(item, i){
+        var idx = String(i+1).padStart(2,'0');
+        var color = langColors[item.lang] || '#a855f7';
+        var level = item.pct===0 ? 'Not Started'
+                  : item.pct<20 ? 'Foundational'
+                  : item.pct<50 ? 'Intermediate'
+                  : 'Advanced';
+
+        var row = document.createElement('div');
+        row.className = 'skill-row';
+        row.innerHTML =
+            '<span class="skill-index">'+idx+'</span>'+
+            '<div class="skill-info">'+
+                '<div class="skill-top">'+
+                    '<span class="skill-name"><i class="dot" style="background:'+color+'"></i>'+item.lang+'</span>'+
+                    '<span class="skill-level">'+level+' <b>'+item.pct+'%</b></span>'+
+                '</div>'+
+                '<div class="bar">'+
+                    '<div class="fill" style="width:'+item.pct+'%;background:'+color+'"></div>'+
+                '</div>'+
+            '</div>';
+
+        container.appendChild(row);
+    });
+
+})
+.catch(function(){
+    container.innerHTML = '<p style="color:var(--muted);text-align:center;">Unable to load language stats right now.</p>';
+});
 
 })();
 </script>
