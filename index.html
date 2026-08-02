@@ -331,12 +331,10 @@ if(projectsContainer){
     projectsContainer.innerHTML='<p style="color:var(--muted);text-align:center;grid-column:1/-1;">Loading repositories…</p>';
 }
 
-fetch('https://api.github.com/users/allaboutshahid/repos?sort=updated&per_page=100')
-.then(function(res){
-    if(!res.ok) throw new Error('GitHub API error');
-    return res.json();
-})
-.then(function(repos){
+var CACHE_KEY = 'gh_repos_cache_allaboutshahid';
+var CACHE_TTL = 30 * 60 * 1000;
+
+function renderAll(repos){
 
     repos = repos.filter(function(r){ return !r.fork; });
 
@@ -423,16 +421,51 @@ fetch('https://api.github.com/users/allaboutshahid/repos?sort=updated&per_page=1
             skillsContainer.appendChild(row);
         });
     }
+}
 
-})
-.catch(function(){
+function showError(message){
     if(projectsContainer){
-        projectsContainer.innerHTML='<p style="color:var(--muted);text-align:center;grid-column:1/-1;">Unable to load repositories right now. <a href="https://github.com/allaboutshahid" target="_blank" style="color:#a855f7;">View on GitHub →</a></p>';
+        projectsContainer.innerHTML='<p style="color:var(--muted);text-align:center;grid-column:1/-1;">'+message+' <a href="https://github.com/allaboutshahid" target="_blank" style="color:#a855f7;">View on GitHub →</a></p>';
     }
     if(skillsContainer){
-        skillsContainer.innerHTML = '<p style="color:var(--muted);text-align:center;">Unable to load language stats right now.</p>';
+        skillsContainer.innerHTML = '<p style="color:var(--muted);text-align:center;">'+message+'</p>';
     }
-});
+}
+
+var cached = null;
+try{
+    var raw = localStorage.getItem(CACHE_KEY);
+    if(raw){
+        var parsed = JSON.parse(raw);
+        if(Date.now() - parsed.time < CACHE_TTL){
+            cached = parsed.repos;
+        }
+    }
+}catch(e){}
+
+if(cached){
+    renderAll(cached);
+}else{
+    fetch('https://api.github.com/users/allaboutshahid/repos?sort=updated&per_page=100')
+    .then(function(res){
+        if(res.status === 403){ throw new Error('rate_limited'); }
+        if(!res.ok) throw new Error('GitHub API error');
+        return res.json();
+    })
+    .then(function(repos){
+        try{
+            localStorage.setItem(CACHE_KEY, JSON.stringify({ time: Date.now(), repos: repos }));
+        }catch(e){}
+        renderAll(repos);
+    })
+    .catch(function(err){
+        if(err && err.message === 'rate_limited'){
+            showError('GitHub rate limit reached — please check back in a bit.');
+        }else{
+            showError('Unable to load data right now.');
+        }
+    });
+}
 
 })();
 </script>
