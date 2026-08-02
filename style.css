@@ -752,6 +752,17 @@ text-shadow:0 0 15px rgba(168,85,247,.4);
     border-color:rgba(168,85,247,.25);
 }
 
+/* Languages not used yet (0%) — kept in the list but dimmed
+   so used languages visually stand out. Percentage updates
+   automatically once GitHub reports real bytes for them. */
+.skill-row-zero{
+    opacity:.45;
+}
+
+.skill-row-zero:hover{
+    opacity:.75;
+}
+
 .skill-index{
     flex-shrink:0;
     width:32px;
