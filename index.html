@@ -458,6 +458,25 @@ function renderProjectsError(err){
    Technical Skills — real language percentages from GitHub
    ============================================================ */
 
+/* Fixed list of languages that should ALWAYS render in the
+   Skills section, even if GitHub currently reports 0 bytes
+   for them. As soon as a repo actually uses one of these
+   languages, its real percentage (from GitHub) takes over
+   automatically on the next data refresh — nothing else to
+   change here. Add/remove language names below to control
+   the tracked set. */
+var TRACKED_LANGUAGES = [
+    'C',
+    'C++',
+    'Python',
+    'JavaScript',
+    'TypeScript',
+    'HTML',
+    'CSS',
+    'Java',
+    'SQL'
+];
+
 var LANGUAGE_COLORS = {
     'JavaScript':        ['#F7DF1E', '#FFD43B'],
     'TypeScript':         ['#3178C6', '#5A9FE2'],
@@ -497,6 +516,7 @@ function colorsForLanguage(lang){
 }
 
 function levelLabel(pct){
+    if(pct <= 0)  return 'Not Used Yet';
     if(pct >= 40) return 'Advanced';
     if(pct >= 20) return 'Intermediate';
     if(pct >= 8)  return 'Foundational';
@@ -507,29 +527,31 @@ function renderSkills(totals){
     var container = document.getElementById('skills-list');
     if(!container) return;
 
-    var entries = Object.keys(totals)
-        .map(function(lang){ return { name: lang, bytes: totals[lang] }; })
-        .filter(function(e){ return e.bytes > 0; })
-        .sort(function(a, b){ return b.bytes - a.bytes; })
-        .slice(0, 15);
+    /* Total bytes across EVERY language GitHub reports, not just
+       the tracked ones, so percentages reflect real repo makeup. */
+    var totalBytes = Object.keys(totals).reduce(function(sum, lang){
+        return sum + totals[lang];
+    }, 0);
 
-    if(entries.length === 0){
-        container.innerHTML = '<p class="skills-status">No language data available yet — check back once repositories have more code.</p>';
-        return;
-    }
+    /* Always build one row per tracked language. Anything not
+       yet used in a repo simply has 0 bytes -> 0%. */
+    var entries = TRACKED_LANGUAGES.map(function(lang){
+        return { name: lang, bytes: totals[lang] || 0 };
+    });
 
-    var totalBytes = entries.reduce(function(sum, e){ return sum + e.bytes; }, 0);
+    /* Used languages first (highest % first), untouched ones last. */
+    entries.sort(function(a, b){ return b.bytes - a.bytes; });
 
     container.innerHTML = '';
 
     entries.forEach(function(entry, i){
         var pct = totalBytes > 0 ? (entry.bytes / totalBytes) * 100 : 0;
-        var pctDisplay = pct >= 10 ? Math.round(pct) : Math.round(pct * 10) / 10;
+        var pctDisplay = pct === 0 ? 0 : (pct >= 10 ? Math.round(pct) : Math.round(pct * 10) / 10);
         var colors = colorsForLanguage(entry.name);
         var index = String(i + 1).padStart(2, '0');
 
         var row = document.createElement('div');
-        row.className = 'skill-row';
+        row.className = 'skill-row' + (entry.bytes === 0 ? ' skill-row-zero' : '');
         row.innerHTML =
             '<span class="skill-index">' + index + '</span>' +
             '<div class="skill-info">' +
