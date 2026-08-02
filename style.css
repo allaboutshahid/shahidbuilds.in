@@ -943,3 +943,11 @@ margin-left:2px;
 }
 
 }
+
+/* --- Skills loading / empty state --- */
+.skills-status{
+    text-align:center;
+    color:var(--muted);
+    padding:20px;
+    font-size:.88rem;
+}
